@@ -446,6 +446,10 @@ function parseTParam(s) {
 
 // Converts an outer, itext or dtext AST node into a string.
 function evalWML(a,env) {
+     if (env == null || env == undefined) {
+        env = createEnv(env);   //If no environment was passed, create a new one
+        //console.log("DEBUG: Created new env");
+    }
     var sout = "";
     // Iterate through the linked list.
     while (a!=null) {
@@ -803,9 +807,35 @@ function doIfeq(template,env) {
 *
 */
 function evalstring(s){
-    return evalWML(parseOuter(s),null);
+    return evalWML(parseOuter(s),createEnv(null));
 }
 //evalWML(a,env)
 //parseOuter(s);
 
-eval
+var toeval = "{:talkaboutplastic|p| A {{ {{{p}}}|getchemical}} button costs {{ {{{p}}}|getcost}}:}. {{talkaboutplastic|{{plastic|polyurethane}}}}"
+var test1 = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |  {{ #ifeq | {{{ arg }}} | getcost | 500 | not a func }}   }} :}  :}";
+
+var plasticO = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |  {{ #ifeq | {{{ arg }}} | getcost | not that much | not a func }}    }} :}  :}"    //Parent should be material
+var metalO = "{: metal | ferrous | {: `| arg | {{ #ifeq | {{{arg}}} | getferrous | {{{ ferrous }}} |    {{ #ifeq | {{{ arg }}} | getcost | a arm and a leg | not a func }}     }} :} :}";
+
+var material = "{: material | type | {: `| arg | {{  #ifeq | {{{ arg }}} | gettype | {{{type}}} |  {{ #ifeq | {{{ arg }}} | getcost | {{ {{{type}}} | getcost  }} | not a func }}  }}  :}  :}"        //else nothing for now
+
+
+var holedO = "{:  holed | number | {:  `| arg | {{ #ifeq | {{{arg}}} | getnumber | {{{ number  }}} |         }} :} :}"; //parent should be attachment
+var shankO = "{:  shank | self-shank | {:  `| arg | {{  #ifeq | {{{arg}}} | getself-shank | {{{ number }}} |        }} :}  :}";
+
+var attachment = "{: attachment | techique | {:  `| arg | {{  #ifeq | {{{arg}}} | gettechnique | {{{ technique }}} | }}  :} :}"
+
+
+var button;
+//create an env where the objects are defined
+var prereqList = [material,plasticO,metalO,attachment,holedO,shankO];
+var baseEnv = createEnv(null);
+for(var i=0; i<prereqList.length; i++){
+    evalWML(parseOuter(prereqList[i]),baseEnv);
+}
+
+var teststr = "{:talkaboutplastic|m| A {{ {{ {{{p}}}|gettype}} |getchemical}} button costs {{ {{ {{{p}}} |gettype}}|getcost}}:} {{talkaboutplastic|{{material |{{plastic|polyurethane}} }} }}"
+evalWML(parseOuter(teststr),baseEnv);
+
+console.log(evalWML(parseOuter(toeval),baseEnv));
