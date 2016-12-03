@@ -817,8 +817,8 @@ function evalstring(s){
 
 
 
-var plasticO = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |  {{ #ifeq | {{{ arg }}} | getcost | cheap |    {{  #ifeq | {{{arg}}} | tostring | material: Plastic, type: {{{chemical}}}, cost: cheap | not a func  }}    }} }} :}  :}"    //Parent should be material
-var metalO = "{: metal | ferrous | {: `| arg | {{ #ifeq | {{{arg}}} | getferrous | {{{ ferrous }}} |    {{ #ifeq | {{{ arg }}} | getcost | expensive |    {{  #ifeq | {{{arg}}} | tostring | material: Metal, ferrous: {{{ferrous}}}, cost: expensive | not a func  }}     }}  }} :} :}";
+var plasticO = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |  {{ #ifeq | {{{ arg }}} | getcost | not that much |    {{  #ifeq | {{{arg}}} | tostring | material: Plastic, type: {{{chemical}}}, cost: not that much | not a func  }}    }} }} :}  :}"    //Parent should be material
+var metalO = "{: metal | ferrous | {: `| arg | {{ #ifeq | {{{arg}}} | getferrous | {{{ ferrous }}} |    {{ #ifeq | {{{ arg }}} | getcost | a arm and a leg |    {{  #ifeq | {{{arg}}} | tostring | material: Metal, ferrous: {{{ferrous}}}, cost: a arm and a leg | not a func  }}     }}  }} :} :}";
 
 var materialO = "{: material | type | {: `| arg | {{  #ifeq | {{{ arg }}} | gettype | {{{type}}} |  {{ #ifeq | {{{ arg }}} | getcost | {{ {{{type}}} | getcost  }} |    {{  #ifeq | {{{arg}}} | tostring | {{ {{{type}}}|tostring }} | {{ {{{type}}}| {{{arg}}} }}  }}    }}  }}  :}  :}" ;       //else nothing for now
 
@@ -829,7 +829,7 @@ var shankO = "{:  shank | self-shank | {:  `| arg | {{  #ifeq | {{{arg}}} | gets
 var attachmentO = "{: attachment | technique | {:  `| arg | {{  #ifeq | {{{arg}}} | gettechnique | {{{technique}}} | {{  #ifeq | {{{ arg }}} | tostring | {{ {{{technique}}}|tostring }} | {{ {{{type}}}| {{{arg}}} }}  }}     }}  :} :}";
 
 
-var buttonO = "{: button | dmaterial | dattachment | ligne | type | technique |{:bmaterial|{{ material|{{ {{{dmaterial}}}| {{{type}}} }} }}:} {:battachment|{{ attachment|{{ {{{dattachment}}}| {{{technique}}} }} }}:} {:  `| arg | {{#ifeq|{{{arg}}}|getmaterial|{{bmaterial}}| {{  #ifeq | {{{ arg }}} | getattachment | {{battachment}} | {{  #ifeq | {{{ arg }}} | gettype | {{ {{bmaterial}} | gettype }} | {{#ifeq|{{{arg}}}|gettechnique|{{ {{battachment}}|gettechnique}}|  {{#ifeq|{{{arg}}}|getligne|{{{ligne}}}|  {{#ifeq|{{{arg}}}|tostring| Button:{{ {{bmaterial}}|tostring}}, {{ {{battachment}} |tostring}}, lignenumber: {{{ligne}}} | {{#ifeq| {{ {{ {{bmaterial}} | gettype }} | {{{ arg }}} }} | not a func | {{ {{ {{battachment}} | gettechnique }} | {{{ arg }}} }}  }}  }}  }}  }} }} }} }} :}:}";//create two instances at the beggining
+var buttonO = "{: button | material | attachment | ligne | type | technique | {:  `| arg | {{#ifeq|{{{arg}}}|getmaterial|{{{material}}}| {{  #ifeq | {{{ arg }}} | getattachment | {{{attachment}}} | {{  #ifeq | {{{ arg }}} | gettype | {{ {{{material}}} | gettype }} | {{#ifeq|{{{arg}}}|gettechnique|{{ {{{attachment}}}|gettechnique}}|  {{#ifeq|{{{arg}}}|getligne|{{{ligne}}}|  {{#ifeq|{{{arg}}}|tostring| {{ {{{material}}}|tostring}}, {{ {{{attachment}}} |tostring}}, lignenumber: {{{ligne}}} | {{#ifeq| {{ {{ {{{material}}} | gettype }} | {{{ arg }}} }} | not a func | {{ {{ {{{attachment}}} | gettechnique }} | {{{ arg }}} }}  }}  }}  }}  }} }} }} }} :}:}";
 
 //cons car list
 
@@ -852,9 +852,8 @@ for(var i=0; i<prereqList.length; i++){
 }
 
 var test1 = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |     {{ #ifeq | {{{ arg }}} | getcost | 500 |  {{  #ifeq | {{{arg}}} | tostring |   | not a func  }}        }} }} :}  :}";
-var test2 = "{:talkaboutbutton|b|button definition as string:{{ {{{b}}}|tostring}}  :} {{talkaboutbutton|{{button |metal|holed|6|yes|4 }} }}";
-var test21 = "{:talkaboutattachment|a|attachment definition as string:{{ {{{a}}}|tostring}}  :} {{talkaboutattachment|{{attachment|{{attachment|{{holed|6}} }} }} }}"
+var test2 = "{:talkaboutmaterial|m|material def as string:{{ {{{m}}}|tostring}}  :} {{talkaboutmaterial|{{material | {{metal| no}} }} }}";
 var test3 = "{{cdr | {{ cdr | {{  cons | a | {{ cons |b |c }}  }} }} }}";
 //evalWML(parseOuter(teststr),baseEnv);
 
-console.log(evalWML(parseOuter(test2),baseEnv));
+console.log(evalWML(parseOuter(test3),baseEnv));
