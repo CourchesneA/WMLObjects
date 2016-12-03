@@ -817,19 +817,19 @@ function evalstring(s){
 
 
 
-var plasticO = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |  {{ #ifeq | {{{ arg }}} | getcost | cheap |    {{  #ifeq | {{{arg}}} | tostring | material: Plastic, type: {{{chemical}}}, cost: cheap | not a func  }}    }} }} :}  :}"    //Parent should be material
-var metalO = "{: metal | ferrous | {: `| arg | {{ #ifeq | {{{arg}}} | getferrous | {{{ ferrous }}} |    {{ #ifeq | {{{ arg }}} | getcost | expensive |    {{  #ifeq | {{{arg}}} | tostring | material: Metal, ferrous: {{{ferrous}}}, cost: expensive | not a func  }}     }}  }} :} :}";
+var plasticO = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |  {{ #ifeq | {{{ arg }}} | getcost | cheap |    {{  #ifeq | {{{arg}}} | tostring | material: Plastic, type: {{{chemical}}}, cost: cheap |not a func}}    }} }} :}  :}"    //Parent should be material
+var metalO = "{: metal | ferrous | {: `| arg | {{ #ifeq | {{{arg}}} | getferrous | {{{ ferrous }}} |    {{ #ifeq | {{{ arg }}} | getcost | expensive |    {{  #ifeq | {{{arg}}} | tostring | material: Metal, ferrous: {{{ferrous}}}, cost: expensive |not a func}}     }}  }} :} :}";
 
-var materialO = "{: material | type | {: `| arg | {{  #ifeq | {{{ arg }}} | gettype | {{{type}}} |  {{ #ifeq | {{{ arg }}} | getcost | {{ {{{type}}} | getcost  }} |    {{  #ifeq | {{{arg}}} | tostring | {{ {{{type}}}|tostring }} | {{ {{{type}}}| {{{arg}}} }}  }}    }}  }}  :}  :}" ;       //else nothing for now
+var materialO = "{:material|type|{:`|arg|{{#ifeq|{{{arg}}}|gettype|{{{type}}}|{{#ifeq|{{{arg}}}|getcost|{{ {{{type}}}|getcost}}|{{#ifeq|{{{arg}}}|tostring|{{ {{{type}}}|tostring }}|{{ {{{type}}}|{{{arg}}} }} }} }} }} :} :}";       //else nothing for now
 
 
-var holedO = "{:  holed | number | {:  `| arg | {{ #ifeq | {{{arg}}} | getnumber | {{{ number  }}} |     {{  #ifeq | {{{arg}}} | tostring | attachment type: holed, holes: {{{number}}} | not a func  }}      }} :} :}"; //parent should be attachment
+var holedO = "{:  holed | number | {:  `| arg | {{ #ifeq | {{{arg}}} | getnumber | {{{ number  }}} |     {{  #ifeq | {{{arg}}} | tostring | attachment type: holed, holes: {{{number}}} |not a func}}      }} :} :}"; //parent should be attachment
 var shankO = "{:  shank | self-shank | {:  `| arg | {{  #ifeq | {{{arg}}} | getself-shank | {{{ number }}} |     {{  #ifeq | {{{arg}}} | tostring | attachment type: shank, self-shank: {{{self-shank}}} | not a func  }}       }} :}  :}";
 
 var attachmentO = "{: attachment | technique | {:  `| arg | {{  #ifeq | {{{arg}}} | gettechnique | {{{technique}}} | {{  #ifeq | {{{ arg }}} | tostring | {{ {{{technique}}}|tostring }} | {{ {{{type}}}| {{{arg}}} }}  }}     }}  :} :}";
 
 
-var buttonO = "{: button | dmaterial | dattachment | ligne | type | technique |{:bmaterial|{{ material|{{ {{{dmaterial}}}| {{{type}}} }} }}:} {:battachment|{{ attachment|{{ {{{dattachment}}}| {{{technique}}} }} }}:} {:  `| arg | {{#ifeq|{{{arg}}}|getmaterial|{{{dmaterial}}}| {{  #ifeq | {{{ arg }}} | getattachment | {{{dattachment}}} | {{  #ifeq | {{{ arg }}} | gettype | {{ {{bmaterial}} | gettype }} | {{#ifeq|{{{arg}}}|gettechnique|{{ {{battachment}}|gettechnique}}|  {{#ifeq|{{{arg}}}|getligne|{{{ligne}}}|  {{#ifeq|{{{arg}}}|tostring| Button:{{ {{bmaterial}}|tostring}}, {{ {{battachment}} |tostring}}, lignenumber: {{{ligne}}} | {{#ifeq| {{ {{ {{bmaterial}} | gettype }} | {{{ arg }}} }} | not a func | {{ {{ {{battachment}} | gettechnique }} | {{{ arg }}} }}| {{ {{ {{bmaterial}} | gettype }} | {{{ arg }}} }} }}  }}  }}  }} }} }} }} :}:}";//create two instances at the beggining
+var buttonO = "{: button |dmaterial| dattachment | ligne | type | technique |{:bmaterial|{{ material|{{ {{{dmaterial}}}| {{{type}}} }} }}:} {:battachment|{{ attachment|{{ {{{dattachment}}}| {{{technique}}} }} }}:}{:`|arg|{{#ifeq|{{{arg}}}|getmaterial|{{{dmaterial}}}|{{#ifeq|{{{arg}}}|getattachment|{{{dattachment}}}|{{#ifeq|{{{arg}}}|gettype|{{ {{bmaterial}}|gettype}}|{{#ifeq|{{{arg}}}|gettechnique|{{ {{battachment}}|gettechnique}}|{{#ifeq|{{{arg}}}|getligne|{{{ligne}}}|{{#ifeq|{{{arg}}}|tostring|{{ {{bmaterial}}|tostring}}, {{ {{battachment}}|tostring}}, lignenumber: {{{ligne}}}|{{#ifeq|{{ {{ {{bmaterial}}|gettype}}|{{{arg}}} }}|not a func|{{ {{ {{battachment}}|gettechnique}}|{{{ arg }}} }}|{{ {{ {{bmaterial}}|gettype}}|{{{arg}}} }} }} }}  }}  }} }} }} }}:}:}";//create two instances at the beggining
 
 //cons car list
 
@@ -839,24 +839,27 @@ var cdr = "{: cdr | cons | {{ {{{cons}}}|cdr}}  :}";    //we can assume list end
 
 //button collection
 
-var buttoncollection = "{: buttoncollection | buttons | title | filter | <table><tr><th>{{{title}}}</th></tr> {{ }} </table> :}";   //TODO handle empty filter
-var addrow = "{: addrow|buttons|filter|{{   #ifeq |{{ {{car | {{{buttons}}} }}|getmaterial}}|filter| <tr><td>{{ {{car|{{{buttons}}} }}|tostring}}</tr></td>   {{#ifeq|{{cdr | {{{buttons}}} }}|null|  | {{addrow | {{cdr | {{{buttons}}} }} |{{{filter}}} }} }}  | {{#ifeq|{{cdr | {{{buttons}}} }}|null|  | {{addrow | {{cdr | {{{buttons}}} }} |{{{filter}}} }} }} }}:}" //empty then part
-
+var buttoncollection = "{: buttoncollection | buttons | title | filter | <table border=\"1\"><tr><th>{{{title}}}</th></tr> {{ #ifeq|{{{filter}}}|platic| {{ addrow|{{{buttons}}}|{{{filter}}} }}|{{#ifeq|metal|{{{filter}}}| {{ addrow|{{{buttons}}}|{{{filter}}} }}| {{ addrows|{{{buttons}}} }} }} }} </table> :}";   //TODO handle empty filter
+var addrow = "{: addrow|buttons|filter|{{ #ifeq |{{ {{car | {{{buttons}}} }}|getmaterial}}|{{{filter}}}| <tr><td>{{ {{car|{{{buttons}}} }}|tostring}}</td></tr>   {{#ifeq|{{cdr | {{{buttons}}} }}|null|  | {{addrow | {{cdr | {{{buttons}}} }} |{{{filter}}} }} }}|{{#ifeq|{{cdr | {{{buttons}}} }}|null|  | {{addrow | {{cdr | {{{buttons}}} }} |{{{filter}}} }} }} }}:}" ;//empty then part
+var addrows = "{: addrows|buttons|filter|<tr><td>{{ {{car|{{{buttons}}} }}|tostring}}</td></tr>   {{#ifeq|{{cdr | {{{buttons}}} }}|null|  | {{addrows | {{cdr | {{{buttons}}} }} |{{{filter}}} }} }}:}";
+var bnd = "{:checkbound|filter|{{#ifeq|{{{filter}}}|metal|metal|{{#ifeq|{{{filter}}}|plastic|plastic| {{car | {{{buttons}}} }}|getmaterial}} }}:}";
 
 
 //create an env where the objects are defined
-var prereqList = [materialO,plasticO,metalO,attachmentO,holedO,shankO, buttonO, cons, car, cdr]; //add button
+var prereqList = [materialO,plasticO,metalO,attachmentO,holedO,shankO, buttonO, cons, car, cdr, buttoncollection, addrow, addrows];
 var baseEnv = createEnv(null);
 for(var i=0; i<prereqList.length; i++){
     evalWML(parseOuter(prereqList[i]),baseEnv);
 }
 
 var test1 = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |     {{ #ifeq | {{{ arg }}} | getcost | 500 |  {{  #ifeq | {{{arg}}} | tostring |   | not a func  }}        }} }} :}  :}";
-var test2 = "{:talkaboutbutton|b|button definition as string:{{ {{{b}}}|tostring}}  :} {{talkaboutbutton|{{button |metal|holed|6|yes|4 }} }}";
+var test2 = "{:talkaboutbutton|b|button definition as string:.{{ {{{b}}}|getmaterial}}.  :} {{talkaboutbutton|{{button|metal|holed|6|yes|4}} }}";
 var test21 = "{:talkaboutattachment|a|attachment definition as string:{{ {{{a}}}|tostring}}  :} {{talkaboutattachment|{{attachment|{{attachment|{{holed|6}} }} }} }}"
 var test22 = "{:talkaboutbutton|b|button definition as string:{{ {{{b}}}|getnumber}}  :} {{talkaboutbutton|{{button |metal|holed|6|yes|4 }} }}";
 
 var test3 = "{{cdr | {{ cdr | {{  cons | a | {{ cons |b |c }}  }} }} }}";
+var test4 = "{{ buttoncollection | {{ cons | {{button |metal|holed|4|yes|4 }} | {{ cons | {{button |metal|shank|2|yes|yes }} | {{ cons | {{button |plastic|holed|8|plywood|4 }} | {{cons | {{button |metal|holed|8|no|1 }} | null }}  }}  }} }} | MightyButtons }}"
+
 //evalWML(parseOuter(teststr),baseEnv);
 
-console.log(evalWML(parseOuter(test22),baseEnv));
+console.log(evalWML(parseOuter(test4),baseEnv));
