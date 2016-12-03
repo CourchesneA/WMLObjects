@@ -812,30 +812,32 @@ function evalstring(s){
 //evalWML(a,env)
 //parseOuter(s);
 
-var toeval = "{:talkaboutplastic|p| A {{ {{{p}}}|getchemical}} button costs {{ {{{p}}}|getcost}}:}. {{talkaboutplastic|{{plastic|polyurethane}}}}"
-var test1 = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |  {{ #ifeq | {{{ arg }}} | getcost | 500 | not a func }}   }} :}  :}";
+//var toeval = "{:talkaboutplastic|p| A {{ {{{p}}}|getchemical}} button costs {{ {{{p}}}|getcost}}:}. {{talkaboutplastic|{{plastic|polyurethane}}}}"
+//var teststr22 = "{:talkaboutplastic|m| A {{ {{ {{{p}}}|gettype}} |getchemical}} button costs {{ {{ {{{p}}} |gettype}}|getcost}}:} {{talkaboutplastic|{{material |{{plastic|polyurethane}} }} }}"
 
-var plasticO = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |  {{ #ifeq | {{{ arg }}} | getcost | not that much | not a func }}    }} :}  :}"    //Parent should be material
-var metalO = "{: metal | ferrous | {: `| arg | {{ #ifeq | {{{arg}}} | getferrous | {{{ ferrous }}} |    {{ #ifeq | {{{ arg }}} | getcost | a arm and a leg | not a func }}     }} :} :}";
+var test1 = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |     {{ #ifeq | {{{ arg }}} | getcost | 500 |  {{  #ifeq | {{{arg}}} | tostring |   | not a func  }}        }} }} :}  :}";
 
-var material = "{: material | type | {: `| arg | {{  #ifeq | {{{ arg }}} | gettype | {{{type}}} |  {{ #ifeq | {{{ arg }}} | getcost | {{ {{{type}}} | getcost  }} | not a func }}  }}  :}  :}"        //else nothing for now
+var plasticO = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |  {{ #ifeq | {{{ arg }}} | getcost | not that much |    {{  #ifeq | {{{arg}}} | tostring | material: Plastic, type: {{{chemical}}}, cost: not that much | not a func  }}    }} }} :}  :}"    //Parent should be material
+var metalO = "{: metal | ferrous | {: `| arg | {{ #ifeq | {{{arg}}} | getferrous | {{{ ferrous }}} |    {{ #ifeq | {{{ arg }}} | getcost | a arm and a leg |    {{  #ifeq | {{{arg}}} | tostring | material: Metal, ferrous: {{{ferrous}}}, cost: a arm and a leg | not a func  }}     }}  }} :} :}";
+
+var materialO = "{: material | type | {: `| arg | {{  #ifeq | {{{ arg }}} | gettype | {{{type}}} |  {{ #ifeq | {{{ arg }}} | getcost | {{ {{{type}}} | getcost  }} |    {{  #ifeq | {{{arg}}} | tostring | {{ {{{type}}}|tostring }} | not a func  }}    }}  }}  :}  :}"        //else nothing for now
 
 
-var holedO = "{:  holed | number | {:  `| arg | {{ #ifeq | {{{arg}}} | getnumber | {{{ number  }}} |         }} :} :}"; //parent should be attachment
-var shankO = "{:  shank | self-shank | {:  `| arg | {{  #ifeq | {{{arg}}} | getself-shank | {{{ number }}} |        }} :}  :}";
+var holedO = "{:  holed | number | {:  `| arg | {{ #ifeq | {{{arg}}} | getnumber | {{{ number  }}} |     {{  #ifeq | {{{arg}}} | tostring | attachment type: holed, holes: {{{number}}} | not a func  }}      }} :} :}"; //parent should be attachment
+var shankO = "{:  shank | self-shank | {:  `| arg | {{  #ifeq | {{{arg}}} | getself-shank | {{{ number }}} |     {{  #ifeq | {{{arg}}} | tostring | attachment type: shank, self-shank: {{{self-shank}}} | not a func  }}       }} :}  :}";
 
-var attachment = "{: attachment | techique | {:  `| arg | {{  #ifeq | {{{arg}}} | gettechnique | {{{ technique }}} | }}  :} :}"
+var attachmentO = "{: attachment | technique | {:  `| arg | {{  #ifeq | {{{arg}}} | gettechnique | {{{technique}}} | {{  #ifeq | {{{ arg }}} | tostring | {{ {{{technique}}}|tostring }} | not a func  }}     }}  :} :}"
 
 
 var button;
 //create an env where the objects are defined
-var prereqList = [material,plasticO,metalO,attachment,holedO,shankO];
+var prereqList = [materialO,plasticO,metalO,attachmentO,holedO,shankO];
 var baseEnv = createEnv(null);
 for(var i=0; i<prereqList.length; i++){
     evalWML(parseOuter(prereqList[i]),baseEnv);
 }
 
-var teststr = "{:talkaboutplastic|m| A {{ {{ {{{p}}}|gettype}} |getchemical}} button costs {{ {{ {{{p}}} |gettype}}|getcost}}:} {{talkaboutplastic|{{material |{{plastic|polyurethane}} }} }}"
-evalWML(parseOuter(teststr),baseEnv);
+var teststr = "{:talkaboutplastic|m| Material def as string:  {{ {{{m}}}|tostring}}  :} {{talkaboutplastic|{{attachment | {{ shank| yes }} }} }}"
+//evalWML(parseOuter(teststr),baseEnv);
 
-console.log(evalWML(parseOuter(toeval),baseEnv));
+console.log(evalWML(parseOuter(teststr),baseEnv));
