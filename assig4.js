@@ -829,7 +829,7 @@ var shankO = "{:  shank | self-shank | {:  `| arg | {{  #ifeq | {{{arg}}} | gets
 var attachmentO = "{: attachment | technique | {:  `| arg | {{  #ifeq | {{{arg}}} | gettechnique | {{{technique}}} | {{  #ifeq | {{{ arg }}} | tostring | {{ {{{technique}}}|tostring }} | not a func  }}     }}  :} :}"
 
 
-var button;
+var button = "{: button | material | attachment | ligne | type | technique | {:  `| arg | {{#ifeq|{{{arg}}}|getmaterial|{{{material}}}| {{  #ifeq | {{{ arg }}} | getattachment | {{{attachment}}} | {{  #ifeq | {{{ arg }}} | gettype | {{ {{{material}}} | gettype }} | {{#ifeq|{{{arg}}}|gettechnique|{{ {{{attachment}}}|gettechnique}}|  {{#ifeq|{{{arg}}}|getligne|{{{ligne}}}|  {{#ifeq|{{{arg}}}|tostring| {{ {{{material}}}|tostring}}, {{ {{{attachment}}} |tostring}} | not a func  }}  }}  }} }} }} }} :}:}"
 //create an env where the objects are defined
 var prereqList = [materialO,plasticO,metalO,attachmentO,holedO,shankO];
 var baseEnv = createEnv(null);
