@@ -815,29 +815,45 @@ function evalstring(s){
 //var toeval = "{:talkaboutplastic|p| A {{ {{{p}}}|getchemical}} button costs {{ {{{p}}}|getcost}}:}. {{talkaboutplastic|{{plastic|polyurethane}}}}"
 //var teststr22 = "{:talkaboutplastic|m| A {{ {{ {{{p}}}|gettype}} |getchemical}} button costs {{ {{ {{{p}}} |gettype}}|getcost}}:} {{talkaboutplastic|{{material |{{plastic|polyurethane}} }} }}"
 
-var test1 = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |     {{ #ifeq | {{{ arg }}} | getcost | 500 |  {{  #ifeq | {{{arg}}} | tostring |   | not a func  }}        }} }} :}  :}";
+
 
 var plasticO = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |  {{ #ifeq | {{{ arg }}} | getcost | not that much |    {{  #ifeq | {{{arg}}} | tostring | material: Plastic, type: {{{chemical}}}, cost: not that much | not a func  }}    }} }} :}  :}"    //Parent should be material
 var metalO = "{: metal | ferrous | {: `| arg | {{ #ifeq | {{{arg}}} | getferrous | {{{ ferrous }}} |    {{ #ifeq | {{{ arg }}} | getcost | a arm and a leg |    {{  #ifeq | {{{arg}}} | tostring | material: Metal, ferrous: {{{ferrous}}}, cost: a arm and a leg | not a func  }}     }}  }} :} :}";
 
-var materialO = "{: material | type | {: `| arg | {{  #ifeq | {{{ arg }}} | gettype | {{{type}}} |  {{ #ifeq | {{{ arg }}} | getcost | {{ {{{type}}} | getcost  }} |    {{  #ifeq | {{{arg}}} | tostring | {{ {{{type}}}|tostring }} | not a func  }}    }}  }}  :}  :}"        //else nothing for now
+var materialO = "{: material | type | {: `| arg | {{  #ifeq | {{{ arg }}} | gettype | {{{type}}} |  {{ #ifeq | {{{ arg }}} | getcost | {{ {{{type}}} | getcost  }} |    {{  #ifeq | {{{arg}}} | tostring | {{ {{{type}}}|tostring }} | {{ {{{type}}}| {{{arg}}} }}  }}    }}  }}  :}  :}" ;       //else nothing for now
 
 
 var holedO = "{:  holed | number | {:  `| arg | {{ #ifeq | {{{arg}}} | getnumber | {{{ number  }}} |     {{  #ifeq | {{{arg}}} | tostring | attachment type: holed, holes: {{{number}}} | not a func  }}      }} :} :}"; //parent should be attachment
 var shankO = "{:  shank | self-shank | {:  `| arg | {{  #ifeq | {{{arg}}} | getself-shank | {{{ number }}} |     {{  #ifeq | {{{arg}}} | tostring | attachment type: shank, self-shank: {{{self-shank}}} | not a func  }}       }} :}  :}";
 
-var attachmentO = "{: attachment | technique | {:  `| arg | {{  #ifeq | {{{arg}}} | gettechnique | {{{technique}}} | {{  #ifeq | {{{ arg }}} | tostring | {{ {{{technique}}}|tostring }} | not a func  }}     }}  :} :}"
+var attachmentO = "{: attachment | technique | {:  `| arg | {{  #ifeq | {{{arg}}} | gettechnique | {{{technique}}} | {{  #ifeq | {{{ arg }}} | tostring | {{ {{{technique}}}|tostring }} | {{ {{{type}}}| {{{arg}}} }}  }}     }}  :} :}";
 
 
-var button = "{: button | material | attachment | ligne | type | technique | {:  `| arg | {{#ifeq|{{{arg}}}|getmaterial|{{{material}}}| {{  #ifeq | {{{ arg }}} | getattachment | {{{attachment}}} | {{  #ifeq | {{{ arg }}} | gettype | {{ {{{material}}} | gettype }} | {{#ifeq|{{{arg}}}|gettechnique|{{ {{{attachment}}}|gettechnique}}|  {{#ifeq|{{{arg}}}|getligne|{{{ligne}}}|  {{#ifeq|{{{arg}}}|tostring| {{ {{{material}}}|tostring}}, {{ {{{attachment}}} |tostring}} | not a func  }}  }}  }} }} }} }} :}:}"
+var buttonO = "{: button | material | attachment | ligne | type | technique | {:  `| arg | {{#ifeq|{{{arg}}}|getmaterial|{{{material}}}| {{  #ifeq | {{{ arg }}} | getattachment | {{{attachment}}} | {{  #ifeq | {{{ arg }}} | gettype | {{ {{{material}}} | gettype }} | {{#ifeq|{{{arg}}}|gettechnique|{{ {{{attachment}}}|gettechnique}}|  {{#ifeq|{{{arg}}}|getligne|{{{ligne}}}|  {{#ifeq|{{{arg}}}|tostring| {{ {{{material}}}|tostring}}, {{ {{{attachment}}} |tostring}}, lignenumber: {{{ligne}}} | {{#ifeq| {{ {{ {{{material}}} | gettype }} | {{{ arg }}} }} | not a func | {{ {{ {{{attachment}}} | gettechnique }} | {{{ arg }}} }}  }}  }}  }}  }} }} }} }} :}:}";
+
+//cons car list
+
+var cons = "{: cons | first | second | {:`|carg| {{#ifeq|{{{carg}}}|car|{{{first}}}|{{#ifeq|{{{carg}}}|cdr|{{{second}}}|not a func}} }} :} :}";
+var car = "{: car | cons | {{ {{{cons}}}|car}}  :}";
+var cdr = "{: cdr | cons | {{ {{{cons}}}|cdr}}  :}";    //we can assume list ends by the string null
+
+//button collection
+
+var buttoncollection = "{: buttoncollection | buttons | title | filter | <table><tr><th>{{{title}}}</th></tr> {{ }} </table> :}";   //TODO handle empty filter
+var addrow = "{: addrow|buttons|filter|{{   #ifeq |{{ {{car | {{{buttons}}} }}|getmaterial}}|filter| <tr><td>{{ {{car|{{{buttons}}} }}|tostring}}</tr></td>   {{#ifeq|{{cdr | {{{buttons}}} }}|null|  | {{addrow | {{cdr | {{{buttons}}} }} |{{{filter}}} }} }}  | {{#ifeq|{{cdr | {{{buttons}}} }}|null|  | {{addrow | {{cdr | {{{buttons}}} }} |{{{filter}}} }} }} }}:}" //empty then part
+
+
+
 //create an env where the objects are defined
-var prereqList = [materialO,plasticO,metalO,attachmentO,holedO,shankO];
+var prereqList = [materialO,plasticO,metalO,attachmentO,holedO,shankO, buttonO, cons, car, cdr]; //add button
 var baseEnv = createEnv(null);
 for(var i=0; i<prereqList.length; i++){
     evalWML(parseOuter(prereqList[i]),baseEnv);
 }
 
-var teststr = "{:talkaboutplastic|m| Material def as string:  {{ {{{m}}}|tostring}}  :} {{talkaboutplastic|{{attachment | {{ shank| yes }} }} }}"
+var test1 = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |     {{ #ifeq | {{{ arg }}} | getcost | 500 |  {{  #ifeq | {{{arg}}} | tostring |   | not a func  }}        }} }} :}  :}";
+var test2 = "{:talkaboutmaterial|m|material def as string:{{ {{{m}}}|tostring}}  :} {{talkaboutmaterial|{{material | {{metal| no}} }} }}";
+var test3 = "{{cdr | {{ cdr | {{  cons | a | {{ cons |b |c }}  }} }} }}";
 //evalWML(parseOuter(teststr),baseEnv);
 
-console.log(evalWML(parseOuter(teststr),baseEnv));
+console.log(evalWML(parseOuter(test3),baseEnv));
