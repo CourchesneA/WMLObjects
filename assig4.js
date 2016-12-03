@@ -829,7 +829,7 @@ var shankO = "{:  shank | self-shank | {:  `| arg | {{  #ifeq | {{{arg}}} | gets
 var attachmentO = "{: attachment | technique | {:  `| arg | {{  #ifeq | {{{arg}}} | gettechnique | {{{technique}}} | {{  #ifeq | {{{ arg }}} | tostring | {{ {{{technique}}}|tostring }} | {{ {{{type}}}| {{{arg}}} }}  }}     }}  :} :}";
 
 
-var buttonO = "{: button | dmaterial | dattachment | ligne | type | technique |{:bmaterial|{{ material|{{ {{{dmaterial}}}| {{{type}}} }} }}:} {:battachment|{{ attachment|{{ {{{dattachment}}}| {{{technique}}} }} }}:} {:  `| arg | {{#ifeq|{{{arg}}}|getmaterial|{{bmaterial}}| {{  #ifeq | {{{ arg }}} | getattachment | {{battachment}} | {{  #ifeq | {{{ arg }}} | gettype | {{ {{bmaterial}} | gettype }} | {{#ifeq|{{{arg}}}|gettechnique|{{ {{battachment}}|gettechnique}}|  {{#ifeq|{{{arg}}}|getligne|{{{ligne}}}|  {{#ifeq|{{{arg}}}|tostring| Button:{{ {{bmaterial}}|tostring}}, {{ {{battachment}} |tostring}}, lignenumber: {{{ligne}}} | {{#ifeq| {{ {{ {{bmaterial}} | gettype }} | {{{ arg }}} }} | not a func | {{ {{ {{battachment}} | gettechnique }} | {{{ arg }}} }}  }}  }}  }}  }} }} }} }} :}:}";//create two instances at the beggining
+var buttonO = "{: button | dmaterial | dattachment | ligne | type | technique |{:bmaterial|{{ material|{{ {{{dmaterial}}}| {{{type}}} }} }}:} {:battachment|{{ attachment|{{ {{{dattachment}}}| {{{technique}}} }} }}:} {:  `| arg | {{#ifeq|{{{arg}}}|getmaterial|{{{dmaterial}}}| {{  #ifeq | {{{ arg }}} | getattachment | {{{dattachment}}} | {{  #ifeq | {{{ arg }}} | gettype | {{ {{bmaterial}} | gettype }} | {{#ifeq|{{{arg}}}|gettechnique|{{ {{battachment}}|gettechnique}}|  {{#ifeq|{{{arg}}}|getligne|{{{ligne}}}|  {{#ifeq|{{{arg}}}|tostring| Button:{{ {{bmaterial}}|tostring}}, {{ {{battachment}} |tostring}}, lignenumber: {{{ligne}}} | {{#ifeq| {{ {{ {{bmaterial}} | gettype }} | {{{ arg }}} }} | not a func | {{ {{ {{battachment}} | gettechnique }} | {{{ arg }}} }}| {{ {{ {{bmaterial}} | gettype }} | {{{ arg }}} }} }}  }}  }}  }} }} }} }} :}:}";//create two instances at the beggining
 
 //cons car list
 
@@ -854,7 +854,9 @@ for(var i=0; i<prereqList.length; i++){
 var test1 = "{: plastic | chemical | {: `| arg | {{ #ifeq | {{{ arg }}} | getchemical | {{{ chemical }}} |     {{ #ifeq | {{{ arg }}} | getcost | 500 |  {{  #ifeq | {{{arg}}} | tostring |   | not a func  }}        }} }} :}  :}";
 var test2 = "{:talkaboutbutton|b|button definition as string:{{ {{{b}}}|tostring}}  :} {{talkaboutbutton|{{button |metal|holed|6|yes|4 }} }}";
 var test21 = "{:talkaboutattachment|a|attachment definition as string:{{ {{{a}}}|tostring}}  :} {{talkaboutattachment|{{attachment|{{attachment|{{holed|6}} }} }} }}"
+var test22 = "{:talkaboutbutton|b|button definition as string:{{ {{{b}}}|getnumber}}  :} {{talkaboutbutton|{{button |metal|holed|6|yes|4 }} }}";
+
 var test3 = "{{cdr | {{ cdr | {{  cons | a | {{ cons |b |c }}  }} }} }}";
 //evalWML(parseOuter(teststr),baseEnv);
 
-console.log(evalWML(parseOuter(test2),baseEnv));
+console.log(evalWML(parseOuter(test22),baseEnv));
